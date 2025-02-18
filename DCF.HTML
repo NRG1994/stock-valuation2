@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Valuation Calculator</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--background);
+            padding: 2rem;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        }
+
+        .calculator {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .input-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.375rem;
+            background: white;
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .results {
+            margin-top: 1.5rem;
+            background: #eff6ff;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 1rem;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #cbd5e1;
+        }
+
+        .value-output {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Discounted EPS Model -->
+        <div class="calculator">
+            <h2>Discounted EPS Valuation</h2>
+            <div class="input-group">
+                <div>
+                    <label>Current EPS ($)</label>
+                    <input type="number" id="eps" value="5.00" step="0.01">
+                </div>
+                <div>
+                    <label>Forecast Period (Years)</label>
+                    <input type="number" id="epsYears" value="5" min="1">
+                </div>
+            </div>
+            <div class="input-group">
+                <div>
+                    <label>Initial Growth (%)</label>
+                    <input type="number" id="epsGrowth1" value="8" step="0.1">
+                </div>
+                <div>
+                    <label>Terminal Growth (%)</label>
+                    <input type="number" id="epsGrowth2" value="3" step="0.1">
+                </div>
+                <div>
+                    <label>Discount Rate (%)</label>
+                    <input type="number" id="epsDiscount" value="10" step="0.1">
+                </div>
+                <div>
+                    <label>Shares Outstanding (M)</label>
+                    <input type="number" id="epsShares" value="100">
+                </div>
+            </div>
+            <button onclick="calculateEPS()">Calculate EPS Value</button>
+            <div class="results">
+                <div class="value-output" id="epsValue"></div>
+                <h3>EPS Projections</h3>
+                <table id="epsTable">
+                    <thead>
+                        <tr>
+                            <th>Year</th>
+                            <th>EPS</th>
+                            <th>Present Value</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- DCF Model -->
+        <div class="calculator">
+            <h2>DCF Valuation</h2>
+            <div class="input-group">
+                <div>
+                    <label>Forecast Period (Years)</label>
+                    <input type="number" id="dcfYears" value="5" min="1">
+                </div>
+                <div>
+                    <label>Initial Revenue ($M)</label>
+                    <input type="number" id="dcfRevenue" value="100">
+                </div>
+            </div>
+            <div class="input-group">
+                <div>
+                    <label>Revenue Growth (%)</label>
+                    <input type="number" id="dcfGrowth" value="50" step="0.1">
+                </div>
+                <div>
+                    <label>Initial Margin (%)</label>
+                    <input type="number" id="dcfMargin" value="-20" step="0.1">
+                </div>
+                <div>
+                    <label>Margin Improvement/Yr (%)</label>
+                    <input type="number" id="dcfMarginImprove" value="10" step="0.1">
+                </div>
+                <div>
+                    <label>Discount Rate (%)</label>
+                    <input type="number" id="dcfDiscount" value="12" step="0.1">
+                </div>
+                <div>
+                    <label>Terminal Growth (%)</label>
+                    <input type="number" id="dcfTermGrowth" value="4" step="0.1">
+                </div>
+                <div>
+                    <label>Shares Outstanding (M)</label>
+                    <input type="number" id="dcfShares" value="50">
+                </div>
+            </div>
+            <button onclick="calculateDCF()">Calculate DCF Value</button>
+            <div class="results">
+                <div class="value-output" id="dcfValue"></div>
+                <h3>Cash Flow Projections</h3>
+                <table id="dcfTable">
+                    <thead>
+                        <tr>
+                            <th>Year</th>
+                            <th>Revenue</th>
+                            <th>Margin</th>
+                            <th>FCF</th>
+                            <th>PV</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Discounted EPS Calculator
+        function calculateEPS() {
+            // Get inputs
+            const eps = parseFloat(document.getElementById('eps').value);
+            const years = parseInt(document.getElementById('epsYears').value);
+            const g1 = parseFloat(document.getElementById('epsGrowth1').value)/100;
+            const g2 = parseFloat(document.getElementById('epsGrowth2').value)/100;
+            const r = parseFloat(document.getElementById('epsDiscount').value)/100;
+            const shares = parseFloat(document.getElementById('epsShares').value);
+
+            // Validate inputs
+            if(r <= g2) {
+                alert("Error: Discount rate must exceed terminal growth");
+                return;
+            }
+
+            // Calculate projections
+            let tableHTML = '';
+            let totalPV = 0;
+            let terminalValue = 0;
+
+            for(let year = 1; year <= years; year++) {
+                const futureEPS = eps * Math.pow(1 + g1, year);
+                const pv = futureEPS / Math.pow(1 + r, year);
+                totalPV += pv;
+                
+                tableHTML += `
+                    <tr>
+                        <td>${year}</td>
+                        <td>$${futureEPS.toFixed(2)}</td>
+                        <td>$${pv.toFixed(2)}</td>
+                    </tr>
+                `;
+            }
+
+            // Calculate terminal value
+            const finalEPS = eps * Math.pow(1 + g1, years);
+            terminalValue = (finalEPS * (1 + g2)) / (r - g2);
+            const pvTerminal = terminalValue / Math.pow(1 + r, years);
+            totalPV += pvTerminal;
+
+            // Update UI
+            document.getElementById('epsTable').querySelector('tbody').innerHTML = tableHTML;
+            document.getElementById('epsValue').innerHTML = `
+                Intrinsic Value: $${(totalPV).toFixed(2)}/share<br>
+                Total Equity Value: $${(totalPV * shares).toFixed(1)}M
+            `;
+        }
+
+        // DCF Calculator
+        function calculateDCF() {
+            // Get inputs
+            const years = parseInt(document.getElementById('dcfYears').value);
+            const inputs = {
+                revenue: parseFloat(document.getElementById('dcfRevenue').value),
+                growth: parseFloat(document.getElementById('dcfGrowth').value)/100,
+                margin: parseFloat(document.getElementById('dcfMargin').value)/100,
+                marginImprove: parseFloat(document.getElementById('dcfMarginImprove').value)/100,
+                discount: parseFloat(document.getElementById('dcfDiscount').value)/100,
+                termGrowth: parseFloat(document.getElementById('dcfTermGrowth').value)/100,
+                shares: parseFloat(document.getElementById('dcfShares').value)
+            };
+
+            // Validate inputs
+            if(inputs.discount <= inputs.termGrowth) {
+                alert("Error: Discount rate must exceed terminal growth");
+                return;
+            }
+
+            // Calculate projections
+            let tableHTML = '';
+            let totalPV = 0;
+            let finalFCF = 0;
+
+            for(let year = 1; year <= years; year++) {
+                const revenue = inputs.revenue * Math.pow(1 + inputs.growth, year-1);
+                const margin = inputs.margin + (inputs.marginImprove * (year-1));
+                const FCF = revenue * margin;
+                const PV = FCF / Math.pow(1 + inputs.discount, year);
+                
+                totalPV += PV;
+                finalFCF = FCF;
+
+                tableHTML += `
+                    <tr>
+                        <td>${year}</td>
+                        <td>$${revenue.toFixed(1)}M</td>
+                        <td>${(margin*100).toFixed(1)}%</td>
+                        <td>$${FCF.toFixed(1)}M</td>
+                        <td>$${PV.toFixed(1)}M</td>
+                    </tr>
+                `;
+            }
+
+            // Calculate terminal value
+            const terminalValue = (finalFCF * (1 + inputs.termGrowth)) / 
+                                (inputs.discount - inputs.termGrowth);
+            const pvTerminal = terminalValue / Math.pow(1 + inputs.discount, years);
+            totalPV += pvTerminal;
+
+            // Update UI
+            document.getElementById('dcfTable').querySelector('tbody').innerHTML = tableHTML;
+            document.getElementById('dcfValue').innerHTML = `
+                Per Share Value: $${(totalPV/inputs.shares).toFixed(2)}<br>
+                Total Enterprise Value: $${totalPV.toFixed(1)}M
+            `;
+        }
+    </script>
+</body>
+</html>
